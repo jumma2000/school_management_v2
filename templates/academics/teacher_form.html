@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_update %}تعديل معلم{% else %}إضافة معلم{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4 mb-4">
+    <!-- توسيع الحاوية لتستغل مساحة الشاشة -->
+    <div class="col-md-10 col-lg-10">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pb-0">
+                <h4 class="fw-bold">
+                    {% if is_update %}
+                        <i class="bi bi-pencil-square text-warning"></i> تعديل بيانات: {{ object.name }}
+                    {% else %}
+                        <i class="bi bi-person-plus-fill text-primary"></i> إضافة معلم جديد
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- البيانات الأساسية -->
+                    <h5 class="fw-bold text-primary border-bottom pb-2 mb-3">البيانات الأساسية</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">اسم المعلم</label>
+                            <input type="text" name="name" class="form-control" value="{{ object.name|default:'' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">التخصص/المادة</label>
+                            <input type="text" name="subject" class="form-control" value="{{ object.subject|default:'' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">رقم الهاتف</label>
+                            <input type="text" name="phone" class="form-control" value="{{ object.phone|default:'' }}" placeholder="091XXXXXXX">
+                        </div>
+                    </div>
+
+                    <!-- البيانات المصرفية -->
+                    <h5 class="fw-bold text-success border-bottom pb-2 mt-4 mb-3"><i class="bi bi-bank"></i> البيانات المصرفية (اختياري)</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">اسم المصرف</label>
+                            <input type="text" name="bank_name" class="form-control" value="{{ object.bank_name|default:'' }}" placeholder="مثال: مصرف الجمهورية">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">الفرع</label>
+                            <input type="text" name="bank_branch" class="form-control" value="{{ object.bank_branch|default:'' }}" placeholder="مثال: فرع بنغازي">
+                        </div>
+                        
+                        <!-- رقم الحساب -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">رقم الحساب</label>
+                            <input type="text" name="account_number" class="form-control" value="{{ object.account_number|default:'' }}" placeholder="مثال: 123456789">
+                        </div>
+                        
+                        <!-- رقم الآيبان -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">رقم الآيبان (IBAN)</label>
+                            <input type="text" name="bank_account" class="form-control" value="{{ object.bank_account|default:'' }}" placeholder="LY...">
+                        </div>
+                        
+                        <!-- اسم صاحب الحساب -->
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">اسم صاحب الحساب (الرباعي)</label>
+                            <input type="text" name="account_holder" class="form-control" value="{{ object.account_holder|default:'' }}" placeholder="كما هو في الشيك المصرفي">
+                        </div>
+                    </div>
+
+                    <!-- أزرار الحفظ -->
+                    <div class="mt-4 border-top pt-3">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-save"></i> {% if is_update %}حفظ التعديلات{% else %}حفظ المعلم{% endif %}
+                        </button>
+                        <a href="{% url 'teacher_list' %}" class="btn btn-secondary btn-lg">إلغاء</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

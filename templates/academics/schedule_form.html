@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}{% if object %}تعديل حصة{% else %}إضافة حصة{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pb-0">
+                <h4 class="fw-bold">
+                    {% if object %}
+                        <i class="bi bi-pencil-square text-warning"></i> تعديل حصة في الجدول
+                    {% else %}
+                        <i class="bi bi-plus-circle text-primary"></i> إضافة حصة للجدول
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">اليوم</label>
+                            <select name="day" class="form-select" required>
+                                {% for code, name in days %}
+                                <option value="{{ code }}" {% if object and object.day == code %}selected{% endif %}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">الحصة</label>
+                            <select name="period" class="form-select" required>
+                                {% for code, name in periods %}
+                                <option value="{{ code }}" {% if object and object.period == code %}selected{% endif %}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">الشعبة</label>
+                            <select name="school_class" class="form-select" required>
+                                <option value="">اختر الشعبة...</option>
+                                {% for c in classes %}
+                                <option value="{{ c.id }}" {% if object and object.school_class.id == c.id %}selected{% endif %}>{{ c.grade.name }} - {{ c.section }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">المادة</label>
+                            <select name="subject" class="form-select" required>
+                                <option value="">اختر المادة...</option>
+                                {% for s in subjects %}
+                                <option value="{{ s.id }}" {% if object and object.subject.id == s.id %}selected{% endif %}>{{ s.name }} ({{ s.grade.name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">المعلم</label>
+                            <select name="teacher" class="form-select" required>
+                                <option value="">اختر المعلم...</option>
+                                {% for t in teachers %}
+                                <option value="{{ t.id }}" {% if object and object.teacher.id == t.id %}selected{% endif %}>{{ t.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> 
+                            {% if object %}حفظ التعديلات{% else %}حفظ{% endif %}
+                        </button>
+                        <a href="{% url 'schedule_list' %}" class="btn btn-secondary">إلغاء</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

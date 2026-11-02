@@ -1,0 +1,40 @@
+/* تخصيص شريط التنقل العلوي */
+#header {
+    background-color: #1e3a8a !important; /* نفس لون المنظومة الأزرق الداكن */
+    color: white !important;
+}
+
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
+    color: white !important;
+}
+
+/* تخصيص الروابط */
+#header a:link, #header a:visited {
+    color: white !important;
+}
+
+/* تخصيص الأزرار */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background-color: #1e3a8a !important;
+    color: white !important;
+    border-radius: 5px;
+}
+
+.button:hover, input[type=submit]:hover {
+    background-color: #152c6b !important;
+}
+
+/* تخصيص العناوين */
+.module h2, .module caption, .inline-group h2 {
+    background-color: #1e3a8a !important;
+    color: white !important;
+}
+
+/* إضافة الشعار (يمكنك تغيير الرابط لصورة شعار المدرسة) */
+#branding {
+    background-image: url('https://cdn-icons-png.flaticon.com/512/2602/2602419.png'); /* صورة مؤقتة */
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: 40px;
+    padding-right: 50px;
+}

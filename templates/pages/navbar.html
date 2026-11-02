@@ -1,0 +1,94 @@
+<nav class="navbar navbar-expand-lg mb-4 shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}"><i class="bi bi-building me-2"></i> نظام إدارة المدرسة</a>
+        
+        <button class="navbar-toggler border-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">الرئيسية</a></li>
+                
+                <!-- القائمة المنسدلة للطلاب -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownStudents" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-people-fill me-1"></i> الطلاب
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownStudents">
+                        <li><a class="dropdown-item" href="{% url 'student_list' %}"><i class="bi bi-list-ul me-2"></i> قائمة الطلاب</a></li>
+                        <li><a class="dropdown-item" href="{% url 'student_add' %}"><i class="bi bi-person-plus-fill me-2"></i> إضافة طالب</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'student_attendance' %}"><i class="bi bi-calendar-check text-success me-2"></i> سجل الحضور</a></li>
+                    </ul>
+                </li>
+
+                <!-- القائمة المنسدلة للمعلمين -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownTeachers" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-video3 me-1"></i> المعلمين
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownTeachers">
+                        <li><a class="dropdown-item" href="{% url 'teacher_list' %}"><i class="bi bi-list-ul me-2"></i> قائمة المعلمين</a></li>
+                        <li><a class="dropdown-item" href="{% url 'teacher_add' %}"><i class="bi bi-person-plus-fill me-2"></i> إضافة معلم</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <!-- الحضور اليومي الذكي (خاص بالمعلمين) -->
+                        <li><a class="dropdown-item" href="{% url 'daily_attendance' %}"><i class="bi bi-calendar-check text-success me-2"></i> الحضور اليومي (حصص اليوم)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'teacher_attendance' %}"><i class="bi bi-calendar-x text-danger me-2"></i> سجل الحضور التقليدي</a></li>
+                    </ul>
+                </li>
+
+                <!-- القائمة المنسدلة للإعدادات -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownSettings" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-gear me-1"></i> الإعدادات
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownSettings">
+                        <li><a class="dropdown-item" href="{% url 'grade_list' %}"><i class="bi bi-book text-primary me-2"></i> الصفوف الدراسية</a></li>
+                        <!-- الشُعب الجديدة -->
+                        <li><a class="dropdown-item" href="{% url 'class_list' %}"><i class="bi bi-grid-3x3-gap-fill text-info me-2"></i> الشُعب الدراسية</a></li>
+                        <li><a class="dropdown-item" href="{% url 'subject_list' %}"><i class="bi bi-journal-bookmark-fill text-success me-2"></i> المواد الدراسية</a></li>
+                        <li><a class="dropdown-item" href="{% url 'pricing_list' %}"><i class="bi bi-tags text-warning me-2"></i> أسعار الحصص</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <!-- الجدول الأسبوعي الجديد -->
+                        <li><a class="dropdown-item" href="{% url 'schedule_list' %}"><i class="bi bi-calendar-week text-primary me-2"></i> الجدول الأسبوعي</a></li>
+                    </ul>
+                </li>
+
+                <!-- القائمة المنسدلة الشاملة للتقارير -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownReports" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-file-earmark-bar-graph me-1"></i> التقارير
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownReports">
+                        <!-- تقارير الطلاب -->
+                        <li><h6 class="dropdown-header text-primary">تقارير الطلاب</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'student_data_report' %}"><i class="bi bi-person-lines-fill text-info me-2"></i> بيانات الطلاب</a></li>
+                        <li><a class="dropdown-item" href="{% url 'student_attendance_report' %}"><i class="bi bi-calendar-x text-danger me-2"></i> غياب الطلاب</a></li>
+                        <li><a class="dropdown-item" href="{% url 'debt_report' %}"><i class="bi bi-exclamation-triangle text-danger me-2"></i> تقرير المديونيات</a></li>
+                        <li><a class="dropdown-item" href="{% url 'payment_history' %}"><i class="bi bi-wallet2 text-success me-2"></i> سجل المدفوعات</a></li>
+                        
+                        <li><hr class="dropdown-divider"></li>
+                        
+                        <!-- تقارير المعلمين -->
+                        <li><h6 class="dropdown-header text-primary">تقارير المعلمين</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'teacher_data_report' %}"><i class="bi bi-person-vcard text-info me-2"></i> بيانات المعلمين</a></li>
+                        <li><a class="dropdown-item" href="{% url 'teacher_attendance_report' %}"><i class="bi bi-calendar-x text-danger me-2"></i> غياب المعلمين</a></li>
+                        <li><a class="dropdown-item" href="{% url 'salary_list' %}"><i class="bi bi-cash-stack text-info me-2"></i> سجل الرواتب</a></li>
+                    </ul>
+                </li>
+                
+                <!-- روابط الصفحات الجديدة (من نحن واتصل بنا) -->
+                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">من نحن</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">اتصل بنا</a></li>
+                
+                <!-- رابط الإدارة -->
+                <li class="nav-item">
+                    <a class="nav-link text-warning" href="/admin/" target="_blank">
+                        <i class="bi bi-shield-lock"></i> الإدارة
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

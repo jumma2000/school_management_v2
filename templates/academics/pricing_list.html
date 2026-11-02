@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}جدول أسعار الحصص{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 mt-3 gap-3">
+    <h2 class="fw-bold text-dark"><i class="bi bi-tags text-primary"></i> جدول أسعار الحصص</h2>
+    <a href="{% url 'pricing_add' %}" class="btn btn-primary shadow-sm"><i class="bi bi-plus-lg"></i> إضافة تسعير</a>
+</div>
+
+<!-- جدول الكمبيوتر -->
+<div class="card shadow-sm border-0 d-none d-md-block">
+    <div class="table-responsive">
+        <table class="table table-hover text-center align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>المرحلة</th>
+                    <th>الصف</th>
+                    <th>المادة</th>
+                    <th>سعر الحصة (د.ل)</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pricing in pricings %}
+                <tr>
+                    <td><span class="badge bg-secondary">{{ pricing.stage }}</span></td>
+                    <td class="fw-bold">{{ pricing.grade.name }}</td>
+                    <td>{{ pricing.subject.name }}</td>
+                    <td class="text-success fw-bold">{{ pricing.price_per_class|floatformat:2 }}</td>
+                    <td>
+                        <div class="d-flex gap-1 justify-content-center">
+                            <a href="{% url 'pricing_update' pricing.id %}" class="btn btn-sm btn-warning text-dark" title="تعديل"><i class="bi bi-pencil-square"></i></a>
+                            <a href="{% url 'pricing_delete' pricing.id %}" class="btn btn-sm btn-danger" title="حذف"><i class="bi bi-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-muted py-4">لا توجد أسعار مضافة حالياً.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- بطاقات الموبايل -->
+<div class="d-block d-md-none">
+    {% for pricing in pricings %}
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="fw-bold mb-0 text-primary">{{ pricing.subject.name }}</h5>
+                <span class="badge bg-secondary">{{ pricing.stage }}</span>
+            </div>
+            <p class="mb-1 text-muted small">الصف: <strong>{{ pricing.grade.name }}</strong></p>
+            <p class="mb-3 text-success fw-bold">سعر الحصة: {{ pricing.price_per_class|floatformat:2 }} د.ل</p>
+            <div class="d-flex gap-2">
+                <a href="{% url 'pricing_update' pricing.id %}" class="btn btn-warning btn-sm text-dark flex-fill"><i class="bi bi-pencil-square"></i> تعديل</a>
+                <a href="{% url 'pricing_delete' pricing.id %}" class="btn btn-danger btn-sm flex-fill"><i class="bi bi-trash"></i> حذف</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center text-muted py-5">
+        <i class="bi bi-info-circle fs-1 d-block mb-2"></i> لا توجد أسعار مضافة حالياً.
+    </div>
+    {% endfor %}
+</div>
+
+<!-- أزرار التنقل بين الصفحات -->
+<div class="text-center text-muted mb-2 mt-3">
+    الصفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+</div>
+
+{% if page_obj.has_other_pages %}
+<nav aria-label="Page navigation" class="mt-2 mb-5">
+    <ul class="pagination justify-content-center flex-wrap">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">السابق</a></li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">السابق</span></li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">التالي</a></li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">التالي</span></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

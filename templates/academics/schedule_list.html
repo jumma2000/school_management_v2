@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}الجدول الأسبوعي{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <h2 class="fw-bold text-dark"><i class="bi bi-calendar-week text-primary"></i> الجدول الأسبوعي</h2>
+    <a href="{% url 'schedule_add' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> إضافة حصة للجدول</a>
+</div>
+
+<!-- مربع البحث -->
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-2 align-items-center">
+            <div class="col-md-10">
+                <input type="text" name="q" class="form-control" value="{{ search_query }}" placeholder="بحث باسم المعلم، المادة، أو الشعبة...">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> بحث</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover text-center align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>اليوم</th>
+                    <th>الحصة</th>
+                    <th>الشعبة</th>
+                    <th>المادة</th>
+                    <th>المعلم</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for schedule in schedules %}
+                <tr>
+                    <td><span class="badge bg-primary">{{ schedule.day }}</span></td>
+                    <td>{{ schedule.period }}</td>
+                    <td class="fw-bold">{{ schedule.school_class.grade.name }} - {{ schedule.school_class.section }}</td>
+                    <td>{{ schedule.subject.name }}</td>
+                    <td>{{ schedule.teacher.name }}</td>
+                    <td>
+                        <!-- زر التعديل -->
+                        <a href="{% url 'schedule_update' schedule.id %}" class="btn btn-sm btn-warning text-dark" title="تعديل"><i class="bi bi-pencil-square"></i></a>
+                        <!-- زر الحذف -->
+                        <a href="{% url 'schedule_delete' schedule.id %}" class="btn btn-sm btn-danger" title="حذف"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-muted py-4">لا توجد حصص مضافة تطابق بحثك.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

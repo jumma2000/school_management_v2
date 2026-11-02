@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}سجل الدفعات{% endblock %}
+
+{% block content %}
+<!-- كود CSS الخاص بالطباعة -->
+<style>
+    @media print {
+        /* إخفاء العناصر التي لا تظهر في الطباعة */
+        .no-print { display: none !important; }
+        body { background-color: white !important; }
+        .card { border: none !important; box-shadow: none !important; }
+        
+        /* تنسيقات خاصة بالجدول عند الطباعة */
+        .table-dark { 
+            background-color: #212529 !important; 
+            color: white !important; 
+            -webkit-print-color-adjust: exact; 
+        }
+        .table-bordered th, .table-bordered td {
+            border: 1px solid #000 !important;
+        }
+        /* إضافة ترويسة للطباعة */
+        .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+    }
+    
+    /* إخفاء ترويسة الطباعة في وضع العرض العادي */
+    .print-header { display: none; }
+</style>
+
+<!-- شريط العنوان (يختفي عند الطباعة) -->
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 mt-3 gap-3 no-print">
+    <h2 class="fw-bold text-dark"><i class="bi bi-wallet2 text-primary"></i> سجل الدفعات (الخزينة)</h2>
+    <button onclick="window.print()" class="btn btn-secondary shadow-sm"><i class="bi bi-printer"></i> طباعة السجل</button>
+</div>
+
+<!-- نموذج البحث (يختفي عند الطباعة) -->
+<div class="card shadow-sm border-0 mb-4 no-print">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-9">
+                <label class="form-label fw-bold">البحث (اسم الطالب، التاريخ، أو الملاحظات)</label>
+                <input type="text" name="q" class="form-control" value="{{ search_query }}" placeholder="اكتب للبحث...">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> بحث</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- محتوى التقرير -->
+<div class="card shadow-sm border-0 p-4" id="report-content">
+    
+    <!-- ترويسة تظهر فقط عند الطباعة -->
+    <div class="print-header">
+        <h3 class="fw-bold">مدرسة النور الأهلية</h3>
+        <p class="mb-1 text-muted">سجل الدفعات المالية (الخزينة)</p>
+        <p class="mb-0 small">تاريخ الطباعة: {% now "Y-m-d h:i A" %}</p>
+        <hr>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>م</th>
+                    <th>اسم الطالب</th>
+                    <th>المبلغ المدفوع</th>
+                    <th>التاريخ</th>
+                    <th>ملاحظات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="fw-bold">{{ payment.student.name|default:"-" }}</td>
+                    <td class="text-success fw-bold">{{ payment.amount|default:"0.00"|floatformat:2 }}</td>
+                    <td>{{ payment.date|date:"Y-m-d" }}</td>
+                    <td>{{ payment.note|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-muted py-4">لا توجد دفعات مسجلة تطابق بحثك.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="table-dark">
+                <tr>
+                    <th colspan="2" class="text-end">إجمالي المبالغ المعروضة:</th>
+                    <th colspan="3" class="text-start text-success">{{ total_amount|default:"0.00"|floatformat:2 }} د.ل</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="mt-5 text-start">
+        <p class="small text-muted">توقيع الإدارة: _________________</p>
+    </div>
+</div>
+{% endblock %}

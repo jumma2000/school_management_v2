@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}سجل حضور الطلاب{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <h2 class="fw-bold text-dark"><i class="bi bi-calendar-check text-primary"></i> سجل حضور الطلاب</h2>
+    <span class="badge bg-secondary fs-6">{{ today|date:"Y-m-d" }}</span>
+</div>
+
+<div class="card shadow-sm border-0">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="table-responsive">
+            <table class="table table-hover text-center align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>الطالب</th>
+                        <th>الصف</th>
+                        <th>الحالة</th>
+                        <th>ملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in students_with_status %}
+                    <tr>
+                        <td class="fw-bold">{{ item.student.name }}</td>
+                        <td>{{ item.student.grade.name }}</td>
+                        <td>
+                            <select name="status[]" class="form-select form-select-sm">
+                                <option value="حاضر" {% if item.status == 'حاضر' %}selected{% endif %}>حاضر</option>
+                                <option value="غائب" {% if item.status == 'غائب' %}selected{% endif %}>غائب</option>
+                                <option value="متأخر" {% if item.status == 'متأخر' %}selected{% endif %}>متأخر</option>
+                                <option value="بعذر" {% if item.status == 'بعذر' %}selected{% endif %}>بعذر</option>
+                            </select>
+                            <input type="hidden" name="student_id[]" value="{{ item.student.id }}">
+                        </td>
+                        <td>
+                            <input type="text" name="note[]" class="form-control form-control-sm" value="{{ item.note|default:'' }}">
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-muted py-4">لا يوجد طلاب مسجلين.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer bg-white text-center">
+            <button type="submit" class="btn btn-success btn-lg"><i class="bi bi-save"></i> حفظ سجل الحضور</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

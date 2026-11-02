@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}تقرير بيانات الطلاب{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        .no-print { display: none !important; }
+        body { background-color: white !important; }
+        .card { border: none !important; box-shadow: none !important; }
+        .table-dark { background-color: #212529 !important; color: white !important; -webkit-print-color-adjust: exact; }
+        .table-bordered th, .table-bordered td { border: 1px solid #000 !important; }
+        .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+    }
+    .print-header { display: none; }
+</style>
+
+<!-- شريط العنوان والطباعة -->
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 mt-3 gap-3 no-print">
+    <h2 class="fw-bold text-dark"><i class="bi bi-person-lines-fill text-primary"></i> تقرير بيانات الطلاب</h2>
+    <button onclick="window.print()" class="btn btn-primary shadow-sm"><i class="bi bi-printer"></i> طباعة التقرير</button>
+</div>
+
+<!-- نموذج الفلترة (البحث والتصفية) -->
+<div class="card shadow-sm border-0 mb-4 no-print">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label fw-bold">بحث باسم الطالب</label>
+                <input type="text" name="q" class="form-control" value="{{ search_query|default:'' }}" placeholder="اكتب اسم الطالب...">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">تصفية حسب الصف</label>
+                <select name="grade" class="form-select">
+                    <option value="">كل الصفوف</option>
+                    <!-- تم تصحيح اسم المتغير هنا ليكون selected_grade -->
+                    {% for grade in grades %}
+                        <option value="{{ grade.id }}" {% if grade.id|stringformat:"s" == selected_grade %}selected{% endif %}>{{ grade.name }}</option>
+                    {% empty %}
+                        <option value="" disabled>لا توجد صفوف مضافة</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> بحث وفلترة</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- الجدول -->
+<div class="card shadow-sm border-0 p-4">
+    <!-- ترويسة تظهر فقط عند الطباعة -->
+    <div class="print-header">
+        <h3 class="fw-bold">نظام إدارة المدرسة</h3>
+        <p class="mb-1 text-muted">تقرير بيانات الطلاب المسجلين</p>
+        <p class="mb-0 small">تاريخ الطباعة: {% now "Y-m-d h:i A" %}</p>
+        <hr>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>م</th>
+                    <th>اسم الطالب</th>
+                    <th>الصف</th>
+                    <th>ولي الأمر</th>
+                    <th>رقم الهاتف</th>
+                    <th>الرسوم</th>
+                    <th>المدفوع</th>
+                    <th>المتبقي</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="fw-bold">{{ student.name|default:"غير محدد" }}</td>
+                    <td>{{ student.grade.name|default:"-" }}</td>
+                    <td>{{ student.parent_name|default:"-" }}</td>
+                    <td>{{ student.phone|default:"-" }}</td>
+                    <td>{{ student.net_fees|default:"0.00"|floatformat:2 }}</td>
+                    <td class="text-success">{{ student.total_paid|default:"0.00"|floatformat:2 }}</td>
+                    <td class="text-danger fw-bold">{{ student.balance|default:"0.00"|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-muted py-4">لا يوجد طلاب مسجلين يطابقون بحثك.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="mt-5 text-start no-print">
+        <p class="small text-muted">توقيع الإدارة: _________________</p>
+    </div>
+</div>
+{% endblock %}

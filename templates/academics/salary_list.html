@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}سجل الرواتب{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3 no-print">
+    <h2 class="fw-bold text-dark"><i class="bi bi-cash-stack text-primary"></i> سجل رواتب المعلمين</h2>
+</div>
+
+<!-- مربع البحث -->
+<div class="card shadow-sm border-0 mb-3 no-print">
+    <div class="card-body">
+        <form method="GET" class="row g-2 align-items-center">
+            <div class="col-md-10">
+                <input type="text" name="q" class="form-control" value="{{ search_query }}" placeholder="بحث باسم المعلم، الشهر، أو السنة...">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> بحث</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- جدول الكمبيوتر -->
+<div class="card shadow-sm border-0 d-none d-md-block">
+    <div class="table-responsive">
+        <table class="table table-hover text-center align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>المعلم</th>
+                    <th>الشهر/السنة</th>
+                    <th>إجمالي الحصص</th>
+                    <th>المكافآت</th>
+                    <th>الخصومات</th>
+                    <th>صافي الراتب</th>
+                    <th>تاريخ الصرف</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for salary in salaries %}
+                <tr>
+                    <td class="fw-bold">{{ salary.teacher.name }}</td>
+                    <td>{{ salary.month }} {{ salary.year }}</td>
+                    <td>
+                        {% for item in salary.salary_items.all %}
+                            <span class="badge bg-info text-dark d-block mb-1">{{ item.total_classes }} حصة ({{ item.pricing.subject.name }})</span>
+                        {% endfor %}
+                    </td>
+                    <td class="text-success">{{ salary.bonus|floatformat:2 }}</td>
+                    <td class="text-danger">{{ salary.deductions|floatformat:2 }}</td>
+                    <td class="fw-bold fs-5">{{ salary.net_salary|floatformat:2 }}</td>
+                    <td>{{ salary.paid_date|date:"Y-m-d" }}</td>
+                    <td>
+                        <a href="{% url 'salary_payslip' salary.id %}" class="btn btn-sm btn-info text-white" title="طباعة القسيمة">
+                            <i class="bi bi-printer"></i> قسيمة
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-muted py-4">لا توجد رواتب مسجلة تطابق بحثك.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- بطاقات الموبايل -->
+<div class="d-block d-md-none">
+    {% for salary in salaries %}
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center pt-3 pb-2">
+            <h5 class="fw-bold mb-0 text-primary">{{ salary.teacher.name }}</h5>
+            <span class="badge bg-secondary">{{ salary.month }} {{ salary.year }}</span>
+        </div>
+        <div class="card-body py-2">
+            <div class="row text-center mb-3">
+                <div class="col-4 border-end">
+                    <small class="text-muted d-block">المكافآت</small>
+                    <span class="fw-bold text-success">{{ salary.bonus|floatformat:2 }}</span>
+                </div>
+                <div class="col-4 border-end">
+                    <small class="text-muted d-block">الخصومات</small>
+                    <span class="fw-bold text-danger">{{ salary.deductions|floatformat:2 }}</span>
+                </div>
+                <div class="col-4">
+                    <small class="text-muted d-block">الصافي</small>
+                    <span class="fw-bold">{{ salary.net_salary|floatformat:2 }}</span>
+                </div>
+            </div>
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{% url 'salary_payslip' salary.id %}" class="btn btn-info btn-sm text-white flex-fill">
+                    <i class="bi bi-printer"></i> قسيمة
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center text-muted py-5">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i> لا توجد رواتب مسجلة.
+    </div>
+    {% endfor %}
+</div>
+
+<!-- أزرار التنقل بين الصفحات -->
+<div class="text-center text-muted mb-2 mt-3 no-print">
+    الصفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+</div>
+
+{% if page_obj.has_other_pages %}
+<nav aria-label="Page navigation" class="mt-2 mb-5 no-print">
+    <ul class="pagination justify-content-center flex-wrap">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">السابق</a></li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">السابق</span></li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">التالي</a></li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">التالي</span></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

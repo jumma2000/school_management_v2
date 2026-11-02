@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_update %}تعديل تسعير{% else %}إضافة تسعير{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pb-0">
+                <h4 class="fw-bold">
+                    {% if is_update %}
+                        <i class="bi bi-pencil-square text-warning"></i> تعديل التسعير
+                    {% else %}
+                        <i class="bi bi-tag-fill text-primary"></i> إضافة تسعير جديد
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">المرحلة</label>
+                            <select name="stage" class="form-select" required>
+                                <option value="">اختر المرحلة...</option>
+                                {% for stage_code, stage_name in stages %}
+                                <option value="{{ stage_code }}" {% if object.stage == stage_code %}selected{% endif %}>{{ stage_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">الصف</label>
+                            <select name="grade" class="form-select" required>
+                                <option value="">اختر الصف...</option>
+                                {% for grade in grades %}
+                                <option value="{{ grade.id }}" {% if object.grade.id == grade.id %}selected{% endif %}>{{ grade.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">المادة</label>
+                            <select name="subject" class="form-select" required>
+                                <option value="">اختر المادة...</option>
+                                {% for subject in subjects %}
+                                <option value="{{ subject.id }}" {% if object.subject.id == subject.id %}selected{% endif %}>{{ subject.name }} ({{ subject.grade.name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">سعر الحصة (د.ل)</label>
+                            <input type="number" step="0.01" name="price" class="form-control" value="{{ object.price_per_class|default:'' }}" required placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> {% if is_update %}حفظ التعديلات{% else %}حفظ{% endif %}
+                        </button>
+                        <a href="{% url 'pricing_list' %}" class="btn btn-secondary">إلغاء</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

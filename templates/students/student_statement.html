@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}كشف حساب - {{ student.name }}{% endblock %}
+
+{% block content %}
+<style>
+    @media print { .no-print { display: none !important; } }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3 no-print">
+    <h2 class="fw-bold"><i class="bi bi-file-earmark-person text-info"></i> كشف حساب</h2>
+    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> طباعة</button>
+</div>
+
+<div class="card shadow-sm border-0 p-4">
+    <div class="text-center mb-4 border-bottom pb-3">
+        <h3 class="fw-bold">مدرسة النور الأهلية</h3>
+        <h5 class="text-muted">كشف حساب الطالب: <span class="text-dark">{{ student.name }}</span></h5>
+        <p class="mb-0 small">الصف: {{ student.grade.name }} | تاريخ الطباعة: {{ today|date:"Y-m-d" }}</p>
+    </div>
+
+    <!-- ملخص الحساب -->
+    <div class="row text-center mb-4">
+        <div class="col-4">
+            <div class="p-3 bg-light rounded">
+                <small class="text-muted d-block">إجمالي الرسوم</small>
+                <h5 class="fw-bold mb-0">{{ student.net_fees|floatformat:2 }}</h5>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="p-3 bg-light rounded">
+                <small class="text-muted d-block">إجمالي المدفوع</small>
+                <h5 class="fw-bold text-success mb-0">{{ student.total_paid|floatformat:2 }}</h5>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="p-3 bg-light rounded">
+                <small class="text-muted d-block">المتبقي</small>
+                <h5 class="fw-bold text-danger mb-0">{{ student.balance|floatformat:2 }}</h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- سجل الدفعات -->
+    <h6 class="fw-bold mt-4 mb-3">سجل الدفعات:</h6>
+    <table class="table table-bordered text-center">
+        <thead class="table-light">
+            <tr>
+                <th>التاريخ</th>
+                <th>المبلغ المدفوع</th>
+                <th>ملاحظات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>{{ payment.date|date:"Y-m-d" }}</td>
+                <td class="text-success fw-bold">{{ payment.amount|floatformat:2 }}</td>
+                <td>{{ payment.note|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-muted">لا توجد دفعات مسجلة لهذا الطالب.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="mt-5 text-start">
+        <p class="small text-muted">توقيع الإدارة: _________________</p>
+    </div>
+</div>
+{% endblock %}

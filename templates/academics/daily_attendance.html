@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}الحضور اليومي{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <h2 class="fw-bold text-dark"><i class="bi bi-calendar-check text-primary"></i> حضور اليوم ({{ day_name }})</h2>
+    <span class="badge bg-secondary fs-6">{{ today|date:"Y-m-d" }}</span>
+</div>
+
+<div class="card shadow-sm border-0">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="table-responsive">
+            <table class="table table-hover text-center align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>الحصة</th>
+                        <th>الشعبة</th>
+                        <th>المادة</th>
+                        <th>المعلم</th>
+                        <th>الحالة</th>
+                        <th>ملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in schedule_data %}
+                    <tr>
+                        <td class="fw-bold">{{ item.schedule.period }}</td>
+                        <td>{{ item.schedule.school_class.grade.name }} - {{ item.schedule.school_class.section }}</td>
+                        <td>{{ item.schedule.subject.name }}</td>
+                        <td>{{ item.schedule.teacher.name }}</td>
+                        <td>
+                            <select name="status[]" class="form-select form-select-sm">
+                                <option value="حاضر" {% if item.status == 'حاضر' %}selected{% endif %}>حاضر</option>
+                                <option value="غائب" {% if item.status == 'غائب' %}selected{% endif %}>غائب</option>
+                                <option value="متأخر" {% if item.status == 'متأخر' %}selected{% endif %}>متأخر</option>
+                            </select>
+                            <input type="hidden" name="teacher_id[]" value="{{ item.schedule.teacher.id }}">
+                        </td>
+                        <td>
+                            <input type="text" name="note[]" class="form-control form-control-sm" value="{{ item.note|default:'' }}">
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-muted py-4">لا توجد حصص مجدولة لهذا اليوم.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if schedule_data %}
+        <div class="card-footer bg-white text-center">
+            <button type="submit" class="btn btn-success btn-lg"><i class="bi bi-save"></i> حفظ حضور اليوم</button>
+        </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

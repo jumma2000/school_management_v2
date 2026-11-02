@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_update %}تعديل صف{% else %}إضافة صف{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pb-0">
+                <h4 class="fw-bold">
+                    {% if is_update %}
+                        <i class="bi bi-pencil-square text-warning"></i> تعديل الصف: {{ object.name }}
+                    {% else %}
+                        <i class="bi bi-plus-circle text-primary"></i> إضافة صف جديد
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">اسم الصف</label>
+                        <input type="text" name="name" class="form-control" value="{{ object.name|default:'' }}" required placeholder="مثال: الصف الأول">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> {% if is_update %}حفظ التعديلات{% else %}حفظ{% endif %}
+                        </button>
+                        <a href="{% url 'grade_list' %}" class="btn btn-secondary">إلغاء</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_update %}تعديل مادة{% else %}إضافة مادة{% endif %}{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pb-0">
+                <h4 class="fw-bold">
+                    {% if is_update %}<i class="bi bi-pencil-square text-warning"></i> تعديل مادة{% else %}<i class="bi bi-plus-circle text-primary"></i> إضافة مادة جديدة{% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">اسم المادة</label>
+                        <input type="text" name="name" class="form-control" value="{{ object.name|default:'' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">الصف الدراسي</label>
+                        <select name="grade" class="form-select" required>
+                            <option value="">اختر الصف...</option>
+                            {% for grade in grades %}
+                            <option value="{{ grade.id }}" {% if object.grade.id == grade.id %}selected{% endif %}>{{ grade.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> حفظ</button>
+                    <a href="{% url 'subject_list' %}" class="btn btn-secondary">إلغاء</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

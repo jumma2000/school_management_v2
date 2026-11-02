@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}احتساب راتب - {{ teacher.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-10">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white pb-3 pt-3">
+                <h4 class="fw-bold mb-0"><i class="bi bi-calculator"></i> احتساب راتب: {{ teacher.name }}</h4>
+            </div>
+            <div class="card-body">
+                
+                <!-- ملخص الحساب التلقائي -->
+                <div class="alert alert-info mb-4">
+                    <h6 class="fw-bold"><i class="bi bi-info-circle"></i> ملخص الحساب التلقائي:</h6>
+                    <ul class="mb-0 small">
+                        <li>الحصص الأسبوعية (من الجدول): <strong>{{ default_data.weekly_classes }}</strong></li>
+                        <li>الغيابات المسجلة هذا الشهر: <strong class="text-danger">{{ default_data.absences }}</strong></li>
+                        <li>إجمالي الحصص المستحقة (تقديرياً): <strong class="text-success">{{ default_data.final_classes }}</strong></li>
+                    </ul>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- بيانات الشهر -->
+                    <div class="row g-3 mb-4 bg-light p-3 rounded">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">الشهر</label>
+                            <select name="month" class="form-select" required>
+                                {% for code, name in months %}
+                                <option value="{{ code }}">{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">السنة</label>
+                            <select name="year" class="form-select" required>
+                                {% for code, name in years %}
+                                <option value="{{ code }}" {% if code == '2026' %}selected{% endif %}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- جدول الحصص (ديناميكي) -->
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">تفاصيل الحصص</h5>
+                    <div id="items-container">
+                        <!-- السطر الأول (افتراضي) -->
+                        <div class="row g-2 mb-2 item-row">
+                            <div class="col-md-7">
+                                <select name="pricing_id[]" class="form-select" required>
+                                    <option value="">اختر الصف والمادة...</option>
+                                    {% for pricing in pricings %}
+                                    <option value="{{ pricing.id }}">{{ pricing.stage }} - {{ pricing.grade.name }} - {{ pricing.subject.name }} ({{ pricing.price_per_class }} د.ل)</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <!-- تعبئة عدد الحصص تلقائياً بالقيمة المحسوبة -->
+                                <input type="number" name="classes[]" class="form-control" value="{{ default_data.final_classes }}" required min="0">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-danger w-100 remove-item"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-primary btn-sm mb-4" id="add-item"><i class="bi bi-plus-circle"></i> إضافة مادة أخرى</button>
+
+                    <!-- المكافآت والخصومات -->
+                    <div class="row g-3 mb-4 bg-light p-3 rounded">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">مكافآت إضافية (د.ل)</label>
+                            <input type="number" step="0.01" name="bonus" class="form-control" value="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">خصومات (د.ل)</label>
+                            <input type="number" step="0.01" name="deductions" class="form-control" value="0">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">ملاحظات</label>
+                            <input type="text" name="note" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success btn-lg"><i class="bi bi-check-circle"></i> حفظ واحتساب الراتب</button>
+                        <a href="{% url 'teacher_list' %}" class="btn btn-secondary btn-lg">إلغاء</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- سكربت لإضافة وحذف الحصص -->
+<script>
+    document.getElementById('add-item').addEventListener('click', function() {
+        const container = document.getElementById('items-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'row g-2 mb-2 item-row';
+        newRow.innerHTML = `
+            <div class="col-md-7">
+                <select name="pricing_id[]" class="form-select" required>
+                    <option value="">اختر الصف والمادة...</option>
+                    {% for pricing in pricings %}
+                    <option value="{{ pricing.id }}">{{ pricing.stage }} - {{ pricing.grade.name }} - {{ pricing.subject.name }} ({{ pricing.price_per_class }} د.ل)</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="number" name="classes[]" class="form-control" placeholder="عدد الحصص" required min="0">
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger w-100 remove-item"><i class="bi bi-trash"></i></button>
+            </div>
+        `;
+        container.appendChild(newRow);
+        
+        newRow.querySelector('.remove-item').addEventListener('click', function() {
+            newRow.remove();
+        });
+    });
+
+    document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.item-row').remove();
+        });
+    });
+</script>
+{% endblock %}

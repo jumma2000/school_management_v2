@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}تقرير المديونيات{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        .no-print { display: none !important; }
+        body { background-color: white !important; }
+        .card { border: none !important; box-shadow: none !important; }
+        .table-dark { background-color: #212529 !important; color: white !important; -webkit-print-color-adjust: exact; }
+    }
+</style>
+
+<!-- شريط العنوان والطباعة (يختفي عند الطباعة) -->
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 mt-3 gap-3 no-print">
+    <h2 class="fw-bold mb-0"><i class="bi bi-file-earmark-text text-danger"></i> تقرير المديونيات</h2>
+    
+    <!-- الأزرار: طباعة و تصدير PDF -->
+    <div class="d-flex gap-2">
+        <a href="{% url 'debt_report_pdf' %}" class="btn btn-danger shadow-sm">
+            <i class="bi bi-file-earmark-pdf"></i> تصدير PDF
+        </a>
+        <button onclick="window.print()" class="btn btn-primary shadow-sm">
+            <i class="bi bi-printer"></i> طباعة
+        </button>
+    </div>
+</div>
+
+<!-- محتوى التقرير -->
+<div class="card shadow-sm border-0 p-4" id="report-content">
+    <!-- رأس التقرير -->
+    <div class="text-center mb-4 border-bottom pb-3">
+        <h3 class="fw-bold">نظام إدارة المدرسة</h3>
+        <p class="mb-1 text-muted">تقرير المديونيات (الطلاب الذين لم يسددوا كامل المبلغ)</p>
+        <p class="mb-0 small">تاريخ التقرير: {{ today|date:"Y-m-d h:i A" }}</p>
+    </div>
+
+    <!-- جدول التقرير -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>م</th>
+                    <th>اسم الطالب</th>
+                    <th>الصف</th>
+                    <th>المدفوع</th>
+                    <th>المتبقي (الدين)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="fw-bold">{{ student.name|default:"غير محدد" }}</td>
+                    <td>{{ student.grade.name|default:"-" }}</td>
+                    <td class="text-success">{{ student.total_paid|default:"0.00"|floatformat:2 }}</td>
+                    <td class="text-danger fw-bold">{{ student.balance|default:"0.00"|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        <i class="bi bi-info-circle fs-4 d-block mb-2"></i>
+                        لا توجد مديونيات حالياً. جميع الطلاب مسددين!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="table-dark">
+                <tr>
+                    <th colspan="4" class="text-end">إجمالي الديون المستحقة:</th>
+                    <th>{{ total_debts|default:"0.00"|floatformat:2 }} د.ل</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    
+    <!-- التوقيع -->
+    <div class="mt-5 text-start no-print">
+        <p class="small text-muted">توقيع الإدارة: _________________</p>
+    </div>
+</div>
+{% endblock %}

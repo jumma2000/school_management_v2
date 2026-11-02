@@ -1,0 +1,41 @@
+<div class="row g-4">
+    <!-- بطاقة عدد الطلاب -->
+    <div class="col-6 col-md-3">
+        <div class="card bg-primary text-white shadow-sm border-0 h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <h6 class="mb-2">عدد الطلاب</h6>
+                <h2 class="fw-bold mb-0">{{ total_students|default:"0" }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقة المعلمين -->
+    <div class="col-6 col-md-3">
+        <div class="card bg-success text-white shadow-sm border-0 h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <h6 class="mb-2">عدد المعلمين</h6>
+                <h2 class="fw-bold mb-0">{{ total_teachers|default:"0" }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقة المحصل اليوم -->
+    <div class="col-6 col-md-3">
+        <div class="card bg-info text-white shadow-sm border-0 h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <h6 class="mb-2">المحصل اليوم</h6>
+                <h2 class="fw-bold mb-0">{{ today_paid|default:"0.00"|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- بطاقة الديون -->
+    <div class="col-6 col-md-3">
+        <div class="card bg-danger text-white shadow-sm border-0 h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <h6 class="mb-2">إجمالي الديون</h6>
+                <h2 class="fw-bold mb-0">{{ total_debts|default:"0.00"|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>

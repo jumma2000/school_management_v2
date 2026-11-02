@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}قسيمة راتب - {{ salary.teacher.name }}{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        /* إخفاء العناصر غير الضرورية */
+        .no-print, 
+        .navbar, 
+        footer, 
+        .footer { display: none !important; }
+        
+        /* ضبط إعدادات الصفحة */
+        @page { 
+            size: A4; 
+            margin: 10mm; /* تقليل الهوامش */
+        }
+        body { 
+            background-color: white !important; 
+            font-size: 12px; /* تصغير الخط ليتسع كل شيء */
+        }
+        
+        /* إزالة الهوامش الكبيرة والمسافات */
+        .container, .container-fluid { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+        .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+        .mb-4 { margin-bottom: 0.5rem !important; }
+        .mt-5 { margin-top: 1rem !important; }
+        .mt-4 { margin-top: 0.5rem !important; }
+        .pb-3 { padding-bottom: 0.5rem !important; }
+        
+        /* تقليل حجم الجداول */
+        .table-bordered th, .table-bordered td { 
+            border: 1px solid #000 !important; 
+            padding: 4px !important; 
+            font-size: 12px;
+        }
+        
+        /* منع قطع الصفحة */
+        .card, .table, .row { page-break-inside: avoid; }
+    }
+</style>
+
+<!-- أزرار التحكم (تختفي عند الطباعة) -->
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3 no-print">
+    <h2 class="fw-bold"><i class="bi bi-file-earmark-text text-primary"></i> قسيمة راتب</h2>
+    <div>
+        <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> طباعة / PDF</button>
+        <a href="{% url 'salary_list' %}" class="btn btn-secondary">عودة للسجل</a>
+    </div>
+</div>
+
+<!-- محتوى القسيمة -->
+<div class="card shadow-sm border-0 p-4 print-container">
+    
+    <!-- ترويسة المدرسة -->
+    <div class="text-center mb-3 border-bottom pb-2">
+        <h4 class="fw-bold">مدرسة النور الأهلية</h4>
+        <h6 class="text-muted">قسيمة راتب (Payslip)</h6>
+        <p class="mb-0 small">تاريخ الطباعة: {{ today|date:"Y-m-d" }}</p>
+    </div>
+
+    <div class="row mb-3">
+        <!-- بيانات المعلم -->
+        <div class="col-6">
+            <h6 class="fw-bold border-bottom pb-1 mb-2">بيانات المعلم:</h6>
+            <p class="mb-1"><strong>الاسم:</strong> {{ salary.teacher.name }}</p>
+            <p class="mb-1"><strong>التخصص:</strong> {{ salary.teacher.subject }}</p>
+            <p class="mb-1"><strong>الشهر:</strong> {{ salary.month }} {{ salary.year }}</p>
+        </div>
+        <!-- البيانات المصرفية -->
+        <div class="col-6">
+            <h6 class="fw-bold border-bottom pb-1 mb-2">بيانات التحويل البنكي:</h6>
+            <p class="mb-1"><strong>المصرف:</strong> {{ salary.teacher.bank_name|default:"غير محدد" }}</p>
+            <p class="mb-1"><strong>الفرع:</strong> {{ salary.teacher.bank_branch|default:"غير محدد" }}</p>
+            <p class="mb-1"><strong>رقم الحساب:</strong> {{ salary.teacher.account_number|default:"-" }}</p>
+            <p class="mb-1"><strong>الآيبان:</strong> {{ salary.teacher.bank_account|default:"-" }}</p>
+        </div>
+    </div>
+
+    <!-- تفاصيل الحصص -->
+    <h6 class="fw-bold border-bottom pb-1 mb-2">تفاصيل الحصص:</h6>
+    <table class="table table-bordered text-center mb-3">
+        <thead class="table-light">
+            <tr>
+                <th>الصف</th>
+                <th>المادة</th>
+                <th>عدد الحصص</th>
+                <th>سعر الحصة</th>
+                <th>الإجمالي</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in salary.salary_items.all %}
+            <tr>
+                <td>{{ item.pricing.grade.name|default:"-" }}</td>
+                <td>{{ item.pricing.subject.name|default:"-" }}</td>
+                <td>{{ item.total_classes }}</td>
+                <td>{{ item.hourly_rate|floatformat:2 }}</td>
+                <td class="fw-bold">{{ item.total_amount|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-muted">لا توجد حصص مسجلة.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- الحساب النهائي -->
+    <div class="row justify-content-end mb-2">
+        <div class="col-md-5">
+            <table class="table table-bordered mb-0">
+                <tr>
+                    <td class="fw-bold">إجمالي الحصص</td>
+                    <td class="text-start">{{ salary.total_classes_amount|floatformat:2 }} د.ل</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">المكافآت</td>
+                    <td class="text-success text-start">+ {{ salary.bonus|floatformat:2 }} د.ل</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">الخصومات</td>
+                    <td class="text-danger text-start">- {{ salary.deductions|floatformat:2 }} د.ل</td>
+                </tr>
+                <tr class="table-dark">
+                    <td class="fw-bold fs-6">صافي الراتب</td>
+                    <td class="fw-bold fs-6 text-start">{{ salary.net_salary|floatformat:2 }} د.ل</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ملاحظات وتوقيعات -->
+    <div class="mt-3">
+        <p class="small text-muted mb-2">ملاحظات: {{ salary.note|default:"-" }}</p>
+        <div class="row mt-4">
+            <div class="col-6 text-center">
+                <p class="fw-bold mb-1">توقيع المعلم</p>
+                <p>_________________</p>
+            </div>
+            <div class="col-6 text-center">
+                <p class="fw-bold mb-1">توقيع المحاسب</p>
+                <p>_________________</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

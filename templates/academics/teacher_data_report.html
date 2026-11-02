@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}تقرير بيانات المعلمين{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        .no-print { display: none !important; }
+        body { background-color: white !important; }
+        .card { border: none !important; box-shadow: none !important; }
+        .table-dark { background-color: #212529 !important; color: white !important; -webkit-print-color-adjust: exact; }
+        .table-bordered th, .table-bordered td { border: 1px solid #000 !important; }
+        .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+    }
+    .print-header { display: none; }
+</style>
+
+<!-- شريط العنوان والطباعة -->
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 mt-3 gap-3 no-print">
+    <h2 class="fw-bold text-dark"><i class="bi bi-person-vcard text-primary"></i> تقرير بيانات المعلمين</h2>
+    <button onclick="window.print()" class="btn btn-primary shadow-sm"><i class="bi bi-printer"></i> طباعة التقرير</button>
+</div>
+
+<!-- نموذج البحث (تم وضعه في المكان الصحيح فوق الجدول) -->
+<div class="card shadow-sm border-0 mb-4 no-print">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-9">
+                <label class="form-label fw-bold">بحث باسم المعلم</label>
+                <input type="text" name="q" class="form-control" value="{{ search_query }}" placeholder="اكتب اسم المعلم...">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> بحث</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- الجدول -->
+<div class="card shadow-sm border-0 p-4">
+    <!-- ترويسة تظهر فقط عند الطباعة -->
+    <div class="print-header">
+        <h3 class="fw-bold">مدرسة النور الأهلية</h3>
+        <p class="mb-1 text-muted">تقرير بيانات المعلمين</p>
+        <p class="mb-0 small">تاريخ الطباعة: {% now "Y-m-d h:i A" %}</p>
+        <hr>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>م</th>
+                    <th>اسم المعلم</th>
+                    <th>التخصص / المادة</th>
+                    <th>رقم الهاتف</th>
+                    <th>تاريخ التعيين</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="fw-bold">{{ teacher.name|default:"غير محدد" }}</td>
+                    <td>{{ teacher.subject|default:"-" }}</td>
+                    <td>{{ teacher.phone|default:"-" }}</td>
+                    <td>{{ teacher.created_at|date:"Y-m-d" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-muted py-4">لا يوجد معلمين مسجلين تطابق بحثك.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="mt-5 text-start">
+        <p class="small text-muted">توقيع الإدارة: _________________</p>
+    </div>
+</div>
+{% endblock %}
