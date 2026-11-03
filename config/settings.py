@@ -52,12 +52,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'school_db',          # اسم قاعدة البيانات التي أنشأتها
-        'USER': 'postgres',           # اسم المستخدم الافتراضي
-        'PASSWORD': 'JUmma_175282',   # كلمة المرور الخاصة بك
-        'HOST': 'localhost',          # أو 127.0.0.1
-        'PORT': '5432',               # المنفذ الافتراضي
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
